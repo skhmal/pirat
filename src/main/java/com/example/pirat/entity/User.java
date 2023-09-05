@@ -1,6 +1,6 @@
 package com.example.pirat.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import  com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -69,5 +69,4 @@ public class User {
     @JsonProperty("has_apikey")
     private int hasApikey;
 
-    // Add getters and setters here
 }

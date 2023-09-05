@@ -14,15 +14,17 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class BitskinsGetDataService implements GetDataService{
+public class BitskinsGetDataService implements GetDataService {
+
     @Value("${bitskins.api-url}")
-    private final String URL;
+    private static String URL;
 
     @Value("${bitskins.key}")
-    private final String KEY;
+    private static  String KEY;
 
     @Value("${bitskins.search-uri}")
-    private final String URI;
+    private static  String URI;
+
 
     private WebClient client = WebClient.create(URL);
 
