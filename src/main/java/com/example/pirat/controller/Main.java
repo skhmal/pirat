@@ -1,14 +1,18 @@
 package com.example.pirat.controller;
 
+import com.example.pirat.entity.Item;
 import com.example.pirat.entity.User;
 import com.example.pirat.entity.search.SearchRequest;
 import com.example.pirat.entity.search.Where;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/as")
@@ -57,7 +61,7 @@ public class Main {
     }
 
     @PostMapping("/getPriceList/{request}")
-    public Flux<Object> getPriceListForParticularItem(@PathVariable String request) {
+    public Mono<ResponseEntity<List<Item>>> getPriceListForParticularItem(@PathVariable String request) {
         Where criteria = new Where();
         criteria.setPrice_from(0);
         criteria.setPrice_to(99999);
@@ -69,15 +73,15 @@ public class Main {
         searchRequest.setOffset(0);
         searchRequest.setWhere(criteria);
 
-        String data = "{\"limit\":30,\"offset\":0,\"where\":{\"price_from\":1000,\"price_to\":5000,\"skin_name\":\"%usp%\",\"tradehold_to\":5}}";
+        String data = "{\"limit\":30,\"offset\":0,\"where\":{\"price_from\":1000,\"price_to\":2000000,\"skin_name\":\"%empress%\",\"tradehold_to\":5}}";
 
-        Flux<Object> exchange = client.post()
+        Mono<ResponseEntity<List<Item>>> exchange = client.post()
                 .uri("/market/search/730")
                 .header("x-apikey", "01a8eba6c0283b1f60e01aee43118c8858c3c2d0b0fb7916151dcce7d75a2ff7")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(data)
                 .retrieve()
-                .bodyToFlux(Object.class);
+                .toEntityList(Item.class);
 
         return exchange;
     }
