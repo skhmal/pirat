@@ -1,5 +1,6 @@
 package com.example.pirat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -10,7 +11,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Item {
 
+    @JsonProperty("name")
     private String name;
+
+    @JsonProperty("price")
     private long price;
 
     @JsonProperty("float_value")
@@ -20,14 +24,6 @@ public class Item {
     private long skinId;
 
     @JsonProperty("stickers")
-    private List<Sticker> stickers;
-
-    private static class Sticker {
-        String name;
-        Integer slot;
-        Integer wear;
-        Long skin_id;
-        Long class_id;
-    }
+    private List<Stickers> stickers;
 
 }
