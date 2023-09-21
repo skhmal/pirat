@@ -1,22 +1,24 @@
 package com.example.pirat.controller;
 
-import com.example.pirat.entity.Item;
 import com.example.pirat.entity.Response;
 import com.example.pirat.entity.User;
 import com.example.pirat.entity.search.SearchRequest;
 import com.example.pirat.entity.search.Where;
 import lombok.extern.java.Log;
-import lombok.extern.log4j.Log4j;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.Disposable;
+import org.springframework.web.reactive.socket.WebSocketMessage;
+import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
+import org.springframework.web.reactive.socket.client.WebSocketClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -43,6 +45,28 @@ public class Main {
                 .header("x-apikey", "01a8eba6c0283b1f60e01aee43118c8858c3c2d0b0fb7916151dcce7d75a2ff7")
                 .retrieve()
                 .bodyToMono(User.class);
+    }
+
+    @GetMapping("/test")
+    public Mono<Void> get1() throws URISyntaxException {
+        String apiKey = "01a8eba6c0283b1f60e01aee43118c8858c3c2d0b0fb7916151dcce7d75a2ff7";
+        String socketUrl = "wss://ws.bitskins.com";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("WS_AUTH_APIKEY", apiKey);
+        headers.add("WS_SUB", "listed");
+        headers.add("WS_SUB", "price_changed");
+
+        WebSocketClient client = new ReactorNettyWebSocketClient();
+        return client.execute(
+                URI.create(socketUrl),
+                headers,
+                session -> session.receive()
+                        .doOnNext(WebSocketMessage::getPayloadAsText)
+                        .log()
+                        .then()
+                        .doOnSuccess(System.out::println)
+                        .doOnError(System.out::println)
+                        .then());
     }
 
     @GetMapping("/getPriceList/{request}")
@@ -80,7 +104,8 @@ public class Main {
 //        searchRequest.setOffset(0);
 //        searchRequest.setWhere(criteria);
 
-        String data = "{\"limit\":30,\"offset\":0,\"where\":{\"price_from\":1000,\"price_to\":2000000,\"skin_name\":\"%Neon%Rider%\",\"tradehold_to\":5}}";;
+        String data = "{\"limit\":30,\"offset\":0,\"where\":{\"price_from\":1000,\"price_to\":2000000,\"skin_name\":\"%Neon%Rider%\",\"tradehold_to\":5}}";
+        ;
 
         Mono<ResponseEntity<List<Response>>> exchange = client.post()
                 .uri("/market/search/730")
